@@ -1,7 +1,7 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-16 14:41:52
- * @LastEditTime: 2023-10-17 16:46:36
+ * @LastEditTime: 2023-10-23 23:28:04
  * @Description: 
  */
 import { defineConfig } from 'vite'
@@ -41,6 +41,7 @@ export default defineConfig({
     rollupOptions: {
       plugins: [buildPlugin()],
     },
+    assetsInlineLimit: 0,
   },
   resolve: {
     alias: [
@@ -57,8 +58,7 @@ export default defineConfig({
         // 两种方式都可以
         // additionalData: '@import "@/assets/scss/global.scss";'
         // additionalData: '@use "@/assets/scss/global.scss" as *;'
-      }
-    }
+      },
+    },
   },
-
 })

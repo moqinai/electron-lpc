@@ -1,13 +1,14 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-17 11:06:31
- * @LastEditTime: 2023-10-17 16:34:22
- * @Description: 
+ * @LastEditTime: 2023-10-23 23:41:49
+ * @Description:
  */
 import { createApp } from 'vue'
-import './style.css'
+import './assets/style.css'
+import './assets/icon/iconfont.css'
 import App from './App.vue'
-import '@/assets/scss/base.scss'
+import { router } from './router'
 // import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 import { ElCollapseTransition } from 'element-plus'
@@ -18,6 +19,4 @@ const app = createApp(App)
 // }
 app.component(ElCollapseTransition.name, ElCollapseTransition)
 
-// createApp(App).mount('#app')
-
-app.mount('#app')
+app.use(router).mount('#app')
