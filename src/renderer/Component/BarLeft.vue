@@ -1,7 +1,7 @@
 <!--
  * @Description: 功能：
  * @Date: 2023-10-17 23:11:34
- * @LastEditTime: 2023-10-23 23:51:02
+ * @LastEditTime: 2023-10-26 00:49:45
 -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
@@ -22,7 +22,9 @@ watch(
     deep: true,
   },
 )
+
 let openSettingWindow = async () => {
+  console.log('123123')
   let config = { modal: true, width: 800, webPreferences: { webviewTag: false } }
   let dialog = await createDialog(`/WindowSetting/AccountSetting`, config)
   window.addEventListener('message', e => {
@@ -30,8 +32,12 @@ let openSettingWindow = async () => {
   })
   let msg = { msgName: 'hello', value: 'msg from your parent' }
   dialog.postMessage(msg)
-  // window.open(`/WindowSetting/AccountSetting`, "_blank", JSON.stringify(config));
+  // 打开一个子窗口
+  // 通过这种方式打开的子窗口不会创建新的进程，效率非常高，可以在几百毫秒内就为用户呈现窗口内容
+  window.open(`/WindowSetting/AccountSetting`, '_blank', JSON.stringify(config))
+  // 这里不能单纯地使用window对象的onload事件或者 document 对象的DOMContentLoaded事件来判断子窗口是否加载成功了。因为这个时候你的业务代码（比如从数据库异步读取数据的逻辑）可能尚未执行完成。
 }
+
 </script>
 <template>
   <div class="BarLeft">

@@ -1,13 +1,13 @@
 <!--
  * @Author: lipengcheng
  * @Date: 2023-10-16 14:41:52
- * @LastEditTime: 2023-10-23 23:47:25
+ * @LastEditTime: 2023-10-26 01:56:34
 -->
 
 <template>
-  <div>
-    <router-view />
-  </div>
+  <!-- <div> -->
+  <router-view />
+  <!-- </div> -->
   <!-- <HelloWorld msg="Vite + Vue" />123 -->
 </template>
 
@@ -24,7 +24,7 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-.logo {
+/* .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
@@ -35,5 +35,5 @@ onMounted(() => {
 }
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
-}
+} */
 </style>

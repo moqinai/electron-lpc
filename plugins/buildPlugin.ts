@@ -1,53 +1,107 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-17 11:33:18
- * @LastEditTime: 2023-10-17 15:06:24
- * @Description: 
+ * @LastEditTime: 2023-10-26 01:27:28
+ * @Description:
  */
 
-import path from "path";
-import fs from "fs";
+import path from 'path'
+import fs from 'fs-extra'
 
 class BuildObj {
   //编译主进程代码
   buildMain() {
-    require("esbuild").buildSync({
-      entryPoints: ["./src/main/mainEntry.ts"],
+    require('esbuild').buildSync({
+      entryPoints: ['./src/main/mainEntry.ts'],
       bundle: true,
-      platform: "node",
+      platform: 'node',
       minify: true, // 生成压缩后的代码
-      outfile: "./dist/mainEntry.js",
-      external: ["electron"],
-    });
+      outfile: './dist/mainEntry.js',
+      external: ['electron'],
+    })
   }
   //为生产环境准备package.json
   preparePackageJson() {
     /* 用户安装我们的产品后，在启动我们的应用程序时，实际上是通过 Electron 启动一个 Node.js 的项目，所以我们要为这个项目准备一个 package.json 文件，
       这个文件是以当前项目的 package.json 文件为蓝本制作而成的。里面注明了主进程的入口文件，移除了一些对最终用户没用的配置节。
     */
-    let pkgJsonPath = path.join(process.cwd(), "package.json");
-    let localPkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
-    let electronConfig = localPkgJson.devDependencies.electron.replace("^", "") // 删掉 Electron 的版本号前面的"^"符号
-    localPkgJson.main = "mainEntry.js";
-    delete localPkgJson.scripts;
-    delete localPkgJson.devDependencies;
-    localPkgJson.devDependencies = { electron: electronConfig };
-    let tarJsonPath = path.join(process.cwd(), "dist", "package.json");
-    fs.writeFileSync(tarJsonPath, JSON.stringify(localPkgJson));
-    fs.mkdirSync(path.join(process.cwd(), "dist/node_modules"));
+    let pkgJsonPath = path.join(process.cwd(), 'package.json')
+    let localPkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'))
+    let electronConfig = localPkgJson.devDependencies.electron.replace('^', '') // 删掉 Electron 的版本号前面的"^"符号
+    localPkgJson.main = 'mainEntry.js'
+    delete localPkgJson.scripts
+    delete localPkgJson.devDependencies
+    localPkgJson.devDependencies = { electron: electronConfig }
+    let tarJsonPath = path.join(process.cwd(), 'dist', 'package.json')
+    fs.writeFileSync(tarJsonPath, JSON.stringify(localPkgJson))
+    fs.mkdirSync(path.join(process.cwd(), 'dist/node_modules'))
   }
+
+  async prepareSqlite() {
+    // 拷贝better-sqlite3
+    let srcDir = path.join(process.cwd(), `node_modules/better-sqlite3`)
+    let destDir = path.join(process.cwd(), `dist/node_modules/better-sqlite3`)
+    fs.ensureDirSync(destDir)
+    fs.copySync(srcDir, destDir, {
+      filter: (src, dest) => {
+        if (
+          src.endsWith('better-sqlite3') ||
+          src.endsWith('build') ||
+          src.endsWith('Release') ||
+          src.endsWith('better_sqlite3.node')
+        )
+          return true
+        else if (src.includes('node_modules\\better-sqlite3\\lib')) return true
+        else return false
+      },
+    })
+
+    let pkgJson = `{"name": "better-sqlite3","main": "lib/index.js"}`
+    let pkgJsonPath = path.join(process.cwd(), `dist/node_modules/better-sqlite3/package.json`)
+    fs.writeFileSync(pkgJsonPath, pkgJson)
+    // 制作bindings模块
+    let bindingPath = path.join(process.cwd(), `dist/node_modules/bindings/index.js`)
+    fs.ensureFileSync(bindingPath)
+    let bindingsContent = `module.exports = () => {
+  let addonPath = require("path").join(__dirname, '../better-sqlite3/build/Release/better_sqlite3.node');
+  return require(addonPath);
+  };`
+    fs.writeFileSync(bindingPath, bindingsContent)
+
+    pkgJson = `{"name": "bindings","main": "index.js"}`
+    pkgJsonPath = path.join(process.cwd(), `dist/node_modules/bindings/package.json`)
+    fs.writeFileSync(pkgJsonPath, pkgJson)
+  }
+
+  prepareKnexjs() {
+    let pkgJsonPath = path.join(process.cwd(), `dist/node_modules/knex`)
+    fs.ensureDirSync(pkgJsonPath)
+    require('esbuild').buildSync({
+      entryPoints: ['./node_modules/knex/knex.js'],
+      bundle: true,
+      platform: 'node',
+      format: 'cjs',
+      minify: true,
+      outfile: './dist/node_modules/knex/index.js',
+      external: ['oracledb', 'pg-query-stream', 'pg', 'sqlite3', 'tedious', 'mysql', 'mysql2', 'better-sqlite3'],
+    })
+    let pkgJson = `{"name": "bindings","main": "index.js"}`
+    pkgJsonPath = path.join(process.cwd(), `dist/node_modules/knex/package.json`)
+    fs.writeFileSync(pkgJsonPath, pkgJson)
+  }
+
   // 调用electron-builder提供的 API 以生成安装包
   buildInstaller() {
     let options = {
       config: {
         directories: {
-          output: path.join(process.cwd(), "release"), // 指定安装包存放位置
-          app: path.join(process.cwd(), "dist"), // 静态文件目录配置项
+          output: path.join(process.cwd(), 'release'), // 指定安装包存放位置
+          app: path.join(process.cwd(), 'dist'), // 静态文件目录配置项
         },
-        files: ["**"],
+        files: ['**'],
         extends: null,
-        productName: "LPC", // 项目名，生成的安装文件的前缀名
-        appId: "com.lpc.desktop", // 包名
+        productName: 'LPC', // 项目名，生成的安装文件的前缀名
+        appId: 'com.lpc.desktop', // 包名
         asar: true, // 是否需要把输出目录下的文件合并成一个 asar 文件。
         nsis: {
           oneClick: true, // 是否一键安装
@@ -57,13 +111,13 @@ class BuildObj {
           allowToChangeInstallationDirectory: false, // 是否允许修改安装目录
           createDesktopShortcut: true, // 创建桌面图标
           createStartMenuShortcut: true, // 创建开始菜单图标
-          shortcutName: "LpcDesktopName", // 图标名称
+          shortcutName: 'LpcDesktopName', // 图标名称
         },
-        publish: [{ provider: "generic", url: "http://localhost:5173/" }],
+        publish: [{ provider: 'generic', url: 'http://localhost:5173/' }],
       },
       project: process.cwd(),
-    };
-    return require("electron-builder").build(options);
+    }
+    return require('electron-builder').build(options)
   }
 }
 /* 
@@ -82,13 +136,12 @@ class BuildObj {
 */
 export let buildPlugin = () => {
   return {
-    name: "build-plugin",
+    name: 'build-plugin',
     closeBundle: () => {
-      let buildObj = new BuildObj();
-      buildObj.buildMain();
-      buildObj.preparePackageJson();
-      buildObj.buildInstaller();
+      let buildObj = new BuildObj()
+      buildObj.buildMain()
+      buildObj.preparePackageJson()
+      buildObj.buildInstaller()
     },
-  };
-};
-
+  }
+}

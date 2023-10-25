@@ -1,13 +1,13 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-16 14:41:52
- * @LastEditTime: 2023-10-23 23:28:04
- * @Description: 
+ * @LastEditTime: 2023-10-26 01:35:14
+ * @Description:
  */
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 import { devPlugin, getReplacer } from './plugins/devPlugin'
-import { buildPlugin } from "./plugins/buildPlugin"
+import { buildPlugin } from './plugins/buildPlugin'
 
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -16,9 +16,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import DefineOptions from 'unplugin-vue-define-options/vite'
 import ElementPlus from 'unplugin-element-plus/vite'
 
-import optimizer from "vite-plugin-optimizer"
-
-// const devPlugin = require('./plugins/devPlugin')
+import optimizer from 'vite-plugin-optimizer'
 
 // https://vitejs.dev/config/
 export default defineConfig({

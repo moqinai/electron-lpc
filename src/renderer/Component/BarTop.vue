@@ -1,28 +1,35 @@
 <!--
  * @Description: 功能：
  * @Date: 2023-10-23 23:26:53
- * @LastEditTime: 2023-10-23 23:35:18
+ * @LastEditTime: 2023-10-24 23:45:11
 -->
+//src\renderer\Component\BarTop.vue
 <script setup lang="ts">
 import { onMounted, ref, onUnmounted } from 'vue'
 import { ipcRenderer } from 'electron'
 defineProps<{ title?: string }>()
 let isMaximized = ref(false)
+//关闭窗口
 let closeWindow = () => {
   ipcRenderer.invoke('closeWindow')
 }
+//最大化窗口
 let maxmizeMainWin = () => {
   ipcRenderer.invoke('maxmizeWindow')
 }
+//最小化窗口
 let minimizeMainWindow = () => {
   ipcRenderer.invoke('minimizeWindow')
 }
+//还原窗口
 let unmaximizeMainWindow = () => {
   ipcRenderer.invoke('unmaximizeWindow')
 }
+//窗口最大化事件
 let winMaximizeEvent = () => {
   isMaximized.value = true
 }
+//窗口取消最大化事件
 let winUnmaximizeEvent = () => {
   isMaximized.value = false
 }
@@ -35,6 +42,7 @@ onUnmounted(() => {
   ipcRenderer.off('windowUnmaximized', winUnmaximizeEvent)
 })
 </script>
+
 <template>
   <div class="topBar">
     <div class="winTitle">{{ title }}</div>
@@ -59,7 +67,7 @@ onUnmounted(() => {
   display: flex;
   height: 25px;
   line-height: 25px;
-  -webkit-app-region: drag;
+  -webkit-app-region: drag; /* 可拖拽区域 */
   width: 100%;
 }
 .winTitle {
@@ -71,7 +79,7 @@ onUnmounted(() => {
 .winTool {
   height: 100%;
   display: flex;
-  -webkit-app-region: no-drag;
+  -webkit-app-region: no-drag; /* 可拖拽区域内的不可拖拽区域 */
 }
 .winTool div {
   height: 100%;
