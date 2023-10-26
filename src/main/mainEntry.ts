@@ -1,8 +1,8 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-16 15:09:56
- * @LastEditTime: 2023-10-25 00:17:59
- * @Description:
+ * @LastEditTime: 2023-10-27 02:19:16
+ * @Description: 入口文件
  */
 //src\main\mainEntry.ts
 import { app, BrowserWindow } from 'electron'
@@ -26,6 +26,7 @@ app.whenReady().then(() => {
       webviewTag: true,
       spellcheck: false,
       disableHtmlFullscreenWindowResize: true,
+      // icon: './public/icons/icon.icns' // path.join(__dirname, './public/in.ico')
     },
   }
   mainWindow = new BrowserWindow(config)
@@ -43,5 +44,6 @@ app.whenReady().then(() => {
 })
 
 app.on('browser-window-created', (e, win) => {
+  console.log(e)
   CommonWindowEvent.regWinEvent(win)
 })

@@ -1,7 +1,7 @@
 /*
  * @Description: 功能：
  * @Date: 2023-10-24 23:48:32
- * @LastEditTime: 2023-10-26 00:37:12
+ * @LastEditTime: 2023-10-27 01:13:49
  */
 
 import { BrowserWindow, ipcMain, app } from 'electron'
@@ -28,16 +28,19 @@ export class CommonWindowEvent {
     })
 
     ipcMain.handle('showWindow', e => {
+      console.log('showWindow')
       this.getWin(e)?.show()
     })
 
     ipcMain.handle('closeWindow', e => {
+      console.log('closeWindow')
       this.getWin(e)?.close()
     })
     ipcMain.handle('resizable', e => {
       return this.getWin(e)?.isResizable()
     })
     ipcMain.handle('getPath', (e, name: any) => {
+      console.log(e)
       return app.getPath(name)
     })
   }

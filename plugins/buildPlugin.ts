@@ -1,7 +1,7 @@
 /*
  * @Author: lipengcheng
  * @Date: 2023-10-17 11:33:18
- * @LastEditTime: 2023-10-26 01:27:28
+ * @LastEditTime: 2023-10-27 02:21:07
  * @Description:
  */
 
@@ -28,7 +28,7 @@ class BuildObj {
     let pkgJsonPath = path.join(process.cwd(), 'package.json')
     let localPkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'))
     let electronConfig = localPkgJson.devDependencies.electron.replace('^', '') // 删掉 Electron 的版本号前面的"^"符号
-    localPkgJson.main = 'mainEntry.js'
+    localPkgJson.main = 'mainEntry.js' // Electron 应用启动时，会首先加载主进程的入口文件
     delete localPkgJson.scripts
     delete localPkgJson.devDependencies
     localPkgJson.devDependencies = { electron: electronConfig }
@@ -90,7 +90,7 @@ class BuildObj {
     fs.writeFileSync(pkgJsonPath, pkgJson)
   }
 
-  // 调用electron-builder提供的 API 以生成安装包
+  // 调用electron-builder提供的 API 以生成安装包及一些配置项
   buildInstaller() {
     let options = {
       config: {
@@ -103,6 +103,13 @@ class BuildObj {
         productName: 'LPC', // 项目名，生成的安装文件的前缀名
         appId: 'com.lpc.desktop', // 包名
         asar: true, // 是否需要把输出目录下的文件合并成一个 asar 文件。
+        mac: {
+          icon: './public/icons/icon.icns',
+        },
+        win: {
+          target: [{ target: 'nsis' }],
+          icon: './public/icons/icon.ico'
+        },
         nsis: {
           oneClick: true, // 是否一键安装
           perMachine: true,
@@ -113,6 +120,7 @@ class BuildObj {
           createStartMenuShortcut: true, // 创建开始菜单图标
           shortcutName: 'LpcDesktopName', // 图标名称
         },
+        // 升级服务的地址
         publish: [{ provider: 'generic', url: 'http://localhost:5173/' }],
       },
       project: process.cwd(),

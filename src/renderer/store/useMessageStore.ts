@@ -1,7 +1,7 @@
 /*
  * @Description: 功能：
  * @Date: 2023-10-26 00:17:34
- * @LastEditTime: 2023-10-26 00:17:38
+ * @LastEditTime: 2023-10-26 22:38:18
  */
 //src\renderer\store\useMessageStore.ts
 import { ModelChat } from './../../model/ModelChat'
@@ -17,7 +17,7 @@ export const useMessageStore = defineStore('message', () => {
   // 当选中的聊天会话切换时，我们执行了messageStore对象的initData方法，这样就初始化了messageStore内部的状态数据。
   let initData = (chat: ModelChat) => {
     let result = []
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 1; i++) {
       let model = new ModelMessage()
       model.createTime = Date.now()
       model.isInMsg = i % 2 === 0

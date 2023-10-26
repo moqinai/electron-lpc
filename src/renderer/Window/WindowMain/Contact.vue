@@ -1,166 +1,63 @@
 <!--
- * @Description: 功能：
+ * @Description: 功能：测试element-plus
  * @Date: 2023-10-23 23:30:40
- * @LastEditTime: 2023-10-26 01:50:10
+ * @LastEditTime: 2023-10-27 01:22:31
 -->
 <script setup lang="ts">
-import { db } from '../../../common/db'
-import { ModelChat } from '../../../model/ModelChat'
-import { ModelMessage } from '../../../model/ModelMessage'
-import BarTop from '../../Component/BarTop.vue'
-let insertData = async () => {
-  let model = new ModelChat()
-  model.fromName = '聊天对象'
-  model.sendTime = Date.now()
-  model.lastMsg = '这是此会话的最后一条消息'
-  model.avatar = `https://pic3.zhimg.com/v2-306cd8f07a20cba46873209739c6395d_im.jpg?source=32738c0c`
-  await db('Chat').insert(model)
-}
-let insertMultiData = async () => {
-  let result = []
-  for (let i = 0; i < 10; i++) {
-    let model = new ModelChat()
-    model.fromName = '聊天对象' + i
-    model.sendTime = Date.now() + i
-    model.lastMsg = '这是此会话的最后一条消息' + i
-    model.avatar = `https://pic3.zhimg.com/v2-306cd8f07a20cba46873209739c6395d_im.jpg?source=32738c0c`
-    result.push(model)
-  }
-  result[5].isSelected = true
-  await db('Chat').insert(result)
-}
+import { ref } from 'vue'
 
-let selectData = async () => {
-  let data = await db('Chat').where({ id: `256d6532-fcfe-4b81-a3f8-ee940f2de3e3` }).first()
-  console.log(data)
-}
+defineProps<{ msg: string }>()
+// import { Check, Delete, Edit, Message, Search, Star } from '@element-plus/icons-vue'
 
-let updateData = async () => {
-  let data = await db('Chat')
-    .update({ fromName: '三岛由纪夫', lastMsg: '就在刀刃猛然刺入腹部的瞬间，一轮红日在眼睑背面粲然升了上来。' })
-    .where({ id: `256d6532-fcfe-4b81-a3f8-ee940f2de3e3` })
-    .where({ id: `256d6532-fcfe-4b81-a3f8-ee940f2de3e3` })
-  console.log(data)
-}
+const count = ref(0)
 
-let deleteData = async () => {
-  let data = await db('Chat').where({ id: `256d6532-fcfe-4b81-a3f8-ee940f2de3e3` }).delete()
-  console.log(data)
-}
-
-let transaction = async () => {
-  try {
-    await db.transaction(
-      async (trx: any) => {
-        let chat = new ModelChat()
-        chat.fromName = '聊天对象aaa'
-        chat.sendTime = Date.now()
-        chat.lastMsg = '这是此会话的最后一条消息'
-        chat.avatar = `https://pic3.zhimg.com/v2-306cd8f07a20cba46873209739c6395d_im.jpg?source=32738c0c`
-        await trx('Chat').insert(chat)
-        // throw "throw a error";
-        let message = new ModelMessage()
-        message.fromName = '聊天对象'
-        message.chatId = chat.id
-        message.createTime = Date.now()
-        message.isInMsg = true
-        message.messageContent = '这是我发给你的消息'
-        message.receiveTime = Date.now()
-        message.avatar = `https://pic3.zhimg.com/v2-306cd8f07a20cba46873209739c6395d_im.jpg?source=32738c0c`
-        await trx('Message').insert(message)
-      },
-    )
-  } catch (error) {
-    console.error(error)
-  }
-}
-/**
- * 当前是第几页
- */
-let currentPageIndex = 0
-/**
- * 每页数据行数
- */
-let rowCountPerPage = 6
-/**
- * 总页数(可能有小数部分)
- */
-let pageCount = -1
-/**
- * 获取某一页数据
- */
-let getOnePageData = async () => {
-  let data = await db('Chat')
-    .orderBy('sendTime', 'desc')
-    .offset(currentPageIndex * rowCountPerPage)
-    .limit(rowCountPerPage)
-  console.log(data)
-}
-/**
- * 获取第一页数据
- */
-let getFirstPage = async () => {
-  if (pageCount === -1) {
-    let { count } = await db('Chat').count('id as count').first()
-    count = count as number
-    pageCount = count / rowCountPerPage
-    console.log(pageCount)
-  }
-  currentPageIndex = 0
-  await getOnePageData()
-}
-/**
- * 获取下一页数据
- */
-let getNextPage = async () => {
-  if (currentPageIndex + 1 >= pageCount) {
-    currentPageIndex = Math.ceil(pageCount) - 1
-  } else {
-    currentPageIndex = currentPageIndex + 1
-  }
-  await getOnePageData()
-}
-/**
- * 获取上一页数据
- */
-let getPrevPage = async () => {
-  if (currentPageIndex - 1 < 0) {
-    currentPageIndex = 0
-  } else {
-    currentPageIndex = currentPageIndex - 1
-  }
-  await getOnePageData()
-}
-/**
- * 获取最后一页数据
- */
-let getLastPage = async () => {
-  currentPageIndex = Math.ceil(pageCount) - 1
-  await getOnePageData()
-}
+const tableData = [
+  {
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-02',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-04',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+  {
+    date: '2016-05-01',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+  },
+]
 </script>
 <template>
   <div class="ContactBoard">
     <BarTop />
     <div class="contentTest">
-      <button @click="insertData">增加一行数据</button>
+      <div class="card">
+        <button type="button" @click="count++">count is {{ count }}</button>
+      </div>
 
-      <button @click="insertMultiData">增加多行数据</button>
-
-      <button @click="selectData">查询一行数据</button>
-
-      <button @click="updateData">修改一行数据</button>
-
-      <button @click="deleteData">删除一行数据</button>
-
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="date" label="Date" width="180" />
+        <el-table-column prop="name" label="Name" width="180" />
+        <el-table-column prop="address" label="Address" />
+      </el-table>
       <br />
-
-      <button @click="transaction">使用事务</button>
       <br />
-      <button @click="getFirstPage()">获取第一页数据</button>
-      <button @click="getNextPage()">获取下一页数据</button>
-      <button @click="getPrevPage()">获取上一页数据</button>
-      <button @click="getLastPage()">获取最后一页数据</button>
+      <br />
+      <el-row class="mb-4">
+        <el-button>Default</el-button>
+        <el-button type="primary">Primary</el-button>
+        <el-button type="success">Success</el-button>
+        <el-button type="info">Info</el-button>
+        <el-button type="warning">Warning</el-button>
+        <el-button type="danger">Danger</el-button>
+      </el-row>
     </div>
   </div>
 </template>

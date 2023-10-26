@@ -1,7 +1,7 @@
 /*
  * @Description: 功能：
  * @Date: 2023-10-23 23:51:47
- * @LastEditTime: 2023-10-25 23:29:24
+ * @LastEditTime: 2023-10-27 01:19:55
  */
 
 // 当渲染进程的某个组件需要打开子窗口时，可以使用Dialog.ts提供的createDialog方法
@@ -9,7 +9,7 @@ export let createDialog = (url: string, config: any): Promise<Window> => {
   /* 
     把window.open的逻辑封装到一个Promise对象中， 通过window.open打开子窗口后，当前窗口马上监听message事件，子窗口有消息发送给当前窗口时，这个事件将被触发。
   */
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let windowProxy = window.open(url, '_blank', JSON.stringify(config))
     /* 
       e.data 里存放着具体的消息内容，我们把它格式化成一个 JSON 对象。
